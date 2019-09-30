@@ -45,9 +45,10 @@ const apolloServer = new ApolloServer({
     if (!req.headers.authorization) return {}
     let userId
     try {
-      userId = jwt.verify(req.headers.authorization.split('Bearer ')[1], JWT_SECRET).sub
-    } catch {
-      throw new AuthenticationError('Invalid token')
+      const token = req.headers.authorization.split('Bearer ')[1]
+      userId = jwt.verify(token, JWT_SECRET, { maxAge: '15s' }).sub
+    } catch (err) {
+      throw new AuthenticationError(err)
     }
     const user = usersDb.find(u => u.id === userId)
     if (!user) throw new AuthenticationError('No user for this token')
