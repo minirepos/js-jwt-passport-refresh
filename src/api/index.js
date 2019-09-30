@@ -24,6 +24,7 @@ const apolloServer = new ApolloServer({
     }
     type Query {
       login(email: String!): String!
+      renewToken: String!
       public: String!
       me: User!
     }
@@ -36,6 +37,7 @@ const apolloServer = new ApolloServer({
         if (!user) throw new AuthenticationError('Cannot find user')
         return jwt.sign({ sub: user.id }, JWT_SECRET)
       },
+      renewToken: requireAuth((_, __, { user }) => jwt.sign({ sub: user.id }, JWT_SECRET)),
       me: requireAuth((_, __, { user }) => {
         if (user) return user
       }),
